@@ -53,13 +53,13 @@ intents = discord.Intents.default()
 intents.message_content = True
 bot = commands.Bot(command_prefix='.', intents=intents)
 
+@bot.command()
+async def 도움말(ctx):
+    await ctx.send('-----사용방법 알려주는 내용-----\n'+'점(.)을 메시지 맨 앞에 찍음으로써 명령어를 사용합니다.\n'+'   ex) .도움말\n'+'1. 주식 종목 추가/초기화하는 방법\n'+'.주식설정 (종목코드) (종목명) (최대매수한도) (목표매수주가) (매수개수) (매수시간간격) (목표매도주가) (매도주식개수) (매도시간간격)\n'+'   ex) .주식설정 042110 3500 0 1 60 5210 1 60\n'+'2. 최대 매수 개수\n'+'    ex) .최대매수개수 100\n'+'3. 매수 작동 on/off\n'+'    ex) .매수작동\n'+'4. 매수할 가격\n'+'    ex) .매수가격 55000\n'+'5. 거래마다 매수할 주식 개수\n'+'    ex) .매수개수 1\n'+'6. 매수 시간 간격(초 단위)\n'+'  ex) .매수시간간격 60\n'+'7. 매도 작동 on/off\n'+'   ex) .매도작동\n'+'8. 매도가격\n'+' ex) .매도가격 70000\n'+'9.거래마다 매수할 주식 개수\n'+'    ex) .매도개수 1\n'+'10. 매도 시간 간격(초 단위)\n'+'   ex) .매도시간간격 60\n') # 사용방법 알려주는 help
+
 
 @bot.command()
-async def h(ctx):
-    await ctx.send('사용방법 알려주는 내용') # 사용방법 알려주는 help
-
-@bot.command()
-async def status(ctx, stock_code='0'): # 주식 매수/매도 설정, 현황 확인
+async def 주식현황(ctx, stock_code='0'): # 주식 매수/매도 설정, 현황 확인
     if(stock_code == '0'):
         stocks = load_json_configs()
         for stock in stocks:
@@ -70,61 +70,72 @@ async def status(ctx, stock_code='0'): # 주식 매수/매도 설정, 현황 확
     
     
 @bot.command()
-async def init(ctx, stock_code, max_stock_amount, will_buy, target_buy_price, buy_amount, buy_frequency_time, will_sell, target_sell_price, sell_amount, sell_frequency_time):
+async def 주식설정(ctx, stock_code, max_stock_amount, target_buy_price, buy_amount, buy_frequency_time, target_sell_price, sell_amount, sell_frequency_time):
     stock_name = stock.get_market_ticker_name(stock_code)
+    will_buy = True
+    will_sell = True
     save_json_config(stock_code, stock_name, max_stock_amount, will_buy, target_buy_price, buy_amount, buy_frequency_time, will_sell, target_sell_price, sell_amount, sell_frequency_time)
-    await ctx.send(stock_code + '에 대한 주식 매매 설정 완료.')
+    await ctx.send(stock_name+'('+stock_code + ')에 대한 주식 매매 설정 완료.')
 
 @bot.command()
-async def modify_max_stock_amount(ctx, stock_code, max_stock_amount):
+async def 최대매수개수(ctx, stock_code, max_stock_amount):
     origin = load_json_config(stock_code)
     save_json_config(origin['stock_code'], max_stock_amount, origin['will_buy'], origin['target_buy_price'], origin['buy_amount'], origin['buy_frequency_time'], origin['will_sell'], origin['target_sell_price'], origin['sell_amount'], origin['sell_frequency_time'])
     await ctx.send("최대 한도 매수 주식 개수: ", max_stock_amount)
 
 @bot.command()
-async def modify_will_buy(ctx, stock_code, will_buy):
+async def 매수작동(ctx, stock_code):
     origin = load_json_config(stock_code)
+    if(origin['will_buy'] == True):
+        origin['will_buy'] = False
+    else:
+        origin['will_buy'] = True
     save_json_config(origin['stock_code'], origin['max_stock_amount'], will_buy, origin['target_buy_price'], origin['buy_amount'], origin['buy_frequency_time'], origin['will_sell'], origin['target_sell_price'], origin['sell_amount'], origin['sell_frequency_time'])
-    await ctx.send("매수 자동화 작동: ", will_buy)
+    await ctx.send("매수 자동화 작동: ", origin['will_buy'])
 
 @bot.command()
-async def modify_target_buy_price(ctx, stock_code, target_buy_price):
+async def 매수가격(ctx, stock_code, target_buy_price):
     origin = load_json_config(stock_code)
     save_json_config(origin['stock_code'], origin['max_stock_amount'], origin['will_buy'], target_buy_price, origin['buy_amount'], origin['buy_frequency_time'], origin['will_sell'], origin['target_sell_price'], origin['sell_amount'], origin['sell_frequency_time'])
     await ctx.send("목표 매수 주가: ", target_buy_price)
 
 @bot.command()
-async def modify_buy_amount(ctx, stock_code, buy_amount):
+async def 매수개수(ctx, stock_code, buy_amount):
     origin = load_json_config(stock_code)
     save_json_config(origin['stock_code'], origin['max_stock_amount'], origin['will_buy'], origin['target_buy_price'], buy_amount, origin['buy_frequency_time'], origin['will_sell'], origin['target_sell_price'], origin['sell_amount'], origin['sell_frequency_time'])
     await ctx.send("매수할 개수: ", buy_amount)
 
 @bot.command()
-async def modify_buy_frequency_time(ctx, stock_code, buy_frequency_time):
+async def 매수시간간격(ctx, stock_code, buy_frequency_time):
     origin = load_json_config(stock_code)
     save_json_config(origin['stock_code'], origin['max_stock_amount'], origin['will_buy'], origin['target_buy_price'], origin['buy_amount'], buy_frequency_time, origin['will_sell'], origin['target_sell_price'], origin['sell_amount'], origin['sell_frequency_time'])
     await ctx.send("매수할 시간 간격: ", buy_frequency_time)
 
 @bot.command()
-async def modify_will_sell(ctx, stock_code, will_sell):
+async def 매도작동(ctx, stock_code):
     origin = load_json_config(stock_code)
+    if(origin['will_sell'] == True):
+        origin['will_sell'] = False
+    else:
+        origin['will_sell'] = True
+
     save_json_config(origin['stock_code'], origin['max_stock_amount'], origin['will_buy'], origin['target_buy_price'], origin['buy_amount'], origin['buy_frequency_time'], will_sell, origin['target_sell_price'], origin['sell_amount'], origin['sell_frequency_time'])
-    await ctx.send("매도 자동화 작동: ", will_sell)
+    await ctx.send("매도 자동화 작동: ", origin['will_sell'])
 
 @bot.command()
-async def modify_target_sell_price(ctx, stock_code, target_sell_price):
+async def 매도가격(ctx, stock_code, target_sell_price):
     origin = load_json_config(stock_code)
     save_json_config(origin['stock_code'], origin['max_stock_amount'], origin['will_buy'], origin['target_buy_price'], origin['buy_amount'], origin['buy_frequency_time'], origin['will_sell'], target_sell_price, origin['sell_amount'], origin['sell_frequency_time'])
     await ctx.send("목표 매도 주가: ", target_sell_price)
 
 @bot.command()
-async def modify_sell_amount(ctx, stock_code, sell_amount):
+async def 매도개수(ctx, stock_code, sell_amount):
     origin = load_json_config(stock_code)
     save_json_config(origin['stock_code'], origin['max_stock_amount'], origin['will_buy'], origin['target_buy_price'], origin['buy_amount'], origin['buy_frequency_time'], origin['will_sell'], origin['target_sell_price'], sell_amount, origin['sell_frequency_time'])
     await ctx.send("매도할 주식 개수: ", sell_amount)
 
 @bot.command()
-async def modify_sell_frequency_time(ctx, stock_code, sell_frequency_time):
+async def 매도시간간격(ctx, stock_code, sell_frequency_time):
     origin = load_json_config(stock_code)
     save_json_config(origin['stock_code'], origin['max_stock_amount'], origin['will_buy'], origin['target_buy_price'], origin['buy_amount'], origin['buy_frequency_time'], origin['will_sell'], origin['target_sell_price'], origin['sell_amount'], sell_frequency_time)
     await ctx.send("매도할 시간 간격: ", sell_frequency_time)

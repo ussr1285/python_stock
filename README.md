@@ -16,4 +16,6 @@
 
 ## 디스코드
 
-디스코드로 매수/매도 설정값을 변경한다.
+- 디스코드로 매수/매도 설정값을 변경한다.
+- 채팅 말고, 선택 등 ui가 존재하는 주문으로 해야 좋을 듯? [이것 참고](https://pypi.org/project/discord-ui/)
+- nodejs로 하는게 나을지도? [이것 참고](https://discordjs.guide/)
