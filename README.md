@@ -1,6 +1,16 @@
 # python_stock
  파이썬 주식 자동 거래기 (수동 설정 가격에 따라, 저렴할 때 사고 비쌀 때 판다.)
 
+## 기반 프로그램
+1. [아나콘다](https://www.anaconda.com/products/distribution)
+2. [키움증권 api](), [참고](https://wikidocs.net/85553)
+- pykiwoom api는 32bit 환경으로 설정해 둔 후 설치해야 한다.
+`{bash}
+ set CONDA_FORCE_32BIT=1
+ pip install pykiwoom
+`
+
+
 ## 원칙 (알고리즘?)
 
 1. 시세와 원하는 매수가, 매도가와 비교한다.
@@ -15,7 +25,10 @@
 + 2. 매도가 도달하면 알림 오기? (on/off 가능)
 
 ## 디스코드
-
-- 디스코드로 매수/매도 설정값을 변경한다.
+디스코드로 매수/매도 설정값을 변경한다.
+- discord_boy.py와 같은 위치에 discord_bot_token.json 파일을 만들고, 아래 예시처럼 token 값을 담아 저장해주어야 한다. 
+`{json}
+    {"token": "토큰값"}
+`
 - 채팅 말고, 선택 등 ui가 존재하는 주문으로 해야 좋을 듯? [이것 참고](https://pypi.org/project/discord-ui/)
 - nodejs로 하는게 나을지도? [이것 참고](https://discordjs.guide/)
